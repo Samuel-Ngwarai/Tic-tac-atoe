@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 using namespace std;
@@ -13,7 +11,7 @@ using namespace std;
 //THE BOX WILL TELL US WHETHER A COMPARTMENT IS OCCUPIED AND WHO IS OCCUPYING IT
 class Box{
 private:
-    int occupied;
+    int occupied;		//1 = occupied, 0 = unocupied
 
 public:
     //make box
@@ -38,10 +36,10 @@ public:
 
 };
 
-//The BOARD will contain 9 boxes
+//The BOARD will contain 9 boxes and the logic of how the game will decide who wins or loses
 class Board{
 private:
-    //declaring total counts for checking game progress
+    //declaring total counts per row/column/diagonal for checking game progress
     int r1;
     int r2;
     int r3;
@@ -108,23 +106,17 @@ public:
         c3 = boxes[2].return_occupied() + boxes[5].return_occupied() + boxes[8].return_occupied();
     }
 
-    //for checking row, column and diagonal totals in troubleshooting
-    void values() {
-        cout << r1 << endl << r2 << endl << r3 << endl << endl;
-        cout << d1 << endl << d2 << endl << endl;
-        cout << c1 << endl << c2 << endl << c3 << endl << endl;
-    }
-
     //check the values
     bool check() {
         //if any of the rows, columns or diagonals adds up to 3, X wins
+
         if (r1 == 3 || r2 == 3 || r3 == 3 || d1 == 3 || d2 == 3 || c1 == 3 || c2 == 3 || c3 == 3) {
-            cout << "X WINS!" << endl;
+            cout << endl <<  "******** X WINS! ********" << endl;
             return true;
         }
             //if they add up to -3, Y wins
         else if (r1 == -3 || r2 == -3 || r3 == -3 || d1 == -3 || d2 == -3 || c1 == -3 || c2 == -3 || c3 == -3) {
-            cout << "Y WINS!" << endl;
+            cout << endl << "******** Y WINS! ********" << endl;
             return true;
         }
 
@@ -139,7 +131,7 @@ public:
         return false;
     }
 
-    //making a move
+    //make a move and remove the box from list of unoccupied boxes
     void i_play(int n) {
 
             boxes[n - 1].x_occupy();
@@ -148,6 +140,7 @@ public:
     }
 
     //random move from computer(not strategic in any way, yet)
+    //randomly select a box from the remaining unoccupied boxes
     void c_play() {
         int guess;
         srand (time(NULL));
@@ -158,6 +151,13 @@ public:
 
         boxes[selected].y_occupy();
         b_occupied.erase(remove(b_occupied.begin(), b_occupied.end(), selected), b_occupied.end());
+    }
+
+    void u_play(int n) {
+
+        boxes[n - 1].y_occupy();
+        b_occupied.erase(remove(b_occupied.begin(), b_occupied.end(), n - 1), b_occupied.end());
+        //removing occupied boxes makes random moves much easier to handle
     }
 
     //print the board to see the state of the game
@@ -185,8 +185,33 @@ public:
 int main() {
     Board board;
 
+    int mode;
+
+    cout << endl << endl << "STARTING GAME!" << endl;
+    cout << "*****" << endl;
+    cout << "****" << endl;
+    cout << "***" << endl;
+    cout << "**" << endl;
+    cout << "*" << endl << endl << endl;
+
+
+    cout << "If you have a friend to play against, press '1'" << endl;
+    cout << "Else, if you are lonely, press '0'" << endl;
+
+    cout << ">>";
+    cin >> mode;
+
+    while (mode < 0 || mode > 1) {
+        cout << "Please enter 0 or 1." << endl;
+        cin >> mode;
+    }
+
     int n;
-    cout << "Pick a number to play" << endl;
+    cout << "Your playing board looks like this" << endl;
+    cout << "| 1 || 2 || 3 |" << endl;
+    cout << "| 4 || 5 || 6 |" << endl;
+    cout << "| 7 || 8 || 9 |" << endl << endl;
+    cout << "Pick a number to play between 1 and 9" << endl;
     while (!board.check()) {
         cout << ">>";
         cin >> n;
@@ -198,18 +223,33 @@ int main() {
 
         board.i_play(n);
         board.update();
-        if(board.check()) {
+        if (mode == 1)
+            board.print();
+        if (board.check()) {
             board.print();
             break;
         }
 
-        board.c_play();
+        if (mode == 0) {
+            board.c_play();
+        } else if (mode == 1) {
+            cout << endl << ">>";
+            cin >> n;
+
+            while (n < 1 || n > 9 || board.boxes[n - 1].return_occupied() != 0) {
+                cout << "Please enter a valid number in the range 1-9 that is not occupied" << endl;
+                cin >> n;
+            }
+
+            board.u_play(n);
+        }
         board.update();
         board.print();
-        if(board.check())
+        cout << endl;
+        if (board.check())
             break;
-
     }
+
 
     return 0;
 }
