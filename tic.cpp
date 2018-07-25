@@ -22,10 +22,10 @@ public:
     int boardSize;
     int degree;
 
-    TicTacToe(int n) {
+    TicTacToe(int n, int d) {
         board.resize(n, vector<int>(n, 0));
         boardSize = n;
-        degree = 3;
+        degree = d;
     }
 
     bool invalid(pair<int, int> point) {
@@ -43,6 +43,81 @@ public:
         return false;
     }
 
+    int checkBoard(pair<int, int> point, int pToken) {
+        if (visited.size() == boardSize * boardSize) return -1;
+
+        cout << "Before Vertical " << endl;
+        //check Vertical
+        int vertical = 1;
+        for (int i = point.first - 1; i >= 0; i--) {
+            if (board[i][point.second] != pToken) break;
+            vertical++;
+        }
+        for (int i = point.first + 1; i < boardSize; i++) {
+            if (board[i][point.second] != pToken) break;
+            vertical++;
+        }
+
+        if (vertical >= degree) return 1;
+
+        cout << "Before Horizontal " << endl;
+        //check Horizontal
+        int horizontal = 1;
+        for (int i = point.second - 1; i >= 0; i--) {
+            if (board[point.first][i] != pToken) break;
+            horizontal++;
+        }
+        for (int i = point.second + 1; i < boardSize; i++) {
+            if (board[point.first][i] != pToken) break;
+            horizontal++;
+        }
+        cout << horizontal << endl;
+        if (horizontal >= degree) return 1;
+
+        cout << "Before Fdiagonal " << endl;
+        //check Fdiagonal
+        int fDiagonal = 1;
+        int r = point.first - 1, c = point.second - 1;
+        while(r >= 0 && c >= 0) {
+            if (board[r][c] != pToken) break;
+            r--;
+            c--;
+            fDiagonal++;
+        }
+        r = point.first + 1, c = point.second + 1;
+        while(r < boardSize && c < boardSize) {
+            if (board[r][c] != pToken) break;
+            r++;
+            c++;
+            fDiagonal++;
+        }
+
+        if (fDiagonal >= degree) return 1;
+        
+        cout << "Before Ndiagonal " << endl;
+        //check Ndiagonal
+        int nDiagonal = 1;
+        r = point.first - 1, c = point.second + 1;
+        while(r >= 0 && c < boardSize) {
+            if (board[r][c] != pToken) break;
+            r--;
+            c++;
+            nDiagonal++;
+        }
+        r = point.first + 1, c = point.second - 1;
+        while(r < boardSize && c >= 0) {
+            if (board[r][c] != pToken) break;
+            r++;
+            c--;
+            nDiagonal++;
+        }
+
+        if (nDiagonal >= degree) return 1;
+        
+        return 0;
+
+    }
+
     int move(int row, int col, int player) {
         int diff;
         if (player == 1) diff = 1;
@@ -56,29 +131,30 @@ public:
             cin >> row >> col;
             point = make_pair(row, col);
         }
-
+        
         //add point to board
         board[row][col] = diff;
         visited[point] = true;
 
-        if (diff == 1) {
-            forwardP[row + col] += diff;
-            backwardsP[row - col + boardSize] += diff;
-            rowsP[row] += diff;
-            colsP[col] += diff;
-        } else {
-            forwardN[row + col] += diff;
-            backwardsN[row - col + boardSize] += diff;
-            rowsN[row] += diff;
-            colsN[col] += diff;
-        }
+       // if (diff == 1) {
+       //     forwardP[row + col] += diff;
+       //     backwardsP[row - col + boardSize] += diff;
+       //     rowsP[row] += diff;
+       //     colsP[col] += diff;
+       // } else {
+       //     forwardN[row + col] += diff;
+       //     backwardsN[row - col + boardSize] += diff;
+       //     rowsN[row] += diff;
+       //     colsN[col] += diff;
+       // }
 
-        if (rowsP[row] == degree || colsP[col] == degree || forwardP[row + col] == degree || backwardsP[row - col + boardSize] == degree) return 1;
-        if (rowsN[row] == 0 - degree || colsN[col] == 0 - degree || forwardN[row + col] == 0 - degree || backwardsN[row - col + boardSize] == 0 - degree) return 2;
+        return checkBoard(point, diff);
+        //cout << checkBoard(point, diff) << endl;
 
-        if (visited.size() == boardSize * boardSize) return -1;
-
-        return 0;
+        //if (rowsP[row] == degree || colsP[col] == degree || forwardP[row + col] == degree || backwardsP[row - col + boardSize] == degree) return 1;
+        //if (rowsN[row] == 0 - degree || colsN[col] == 0 - degree || forwardN[row + col] == 0 - degree || backwardsN[row - col + boardSize] == 0 - degree) return 2;
+        //if (visited.size() == boardSize * boardSize) return -1;
+        //return 0;
     }
 
     void visualize() {
@@ -112,7 +188,18 @@ int main() {
         cin >> boardSize;
     }
    
-    TicTacToe game(boardSize);
+
+    cout << "Pick the degree of the tic-tac-go-ing (number of X's/O'sin a line for win condition)" << endl;
+
+    int degree;
+    cin >> degree;
+
+    while (degree < 3 || degree > boardSize) {
+        cout << "Make sure your degree is larger than 3 and smaller than your boardSize" << endl;
+        cin >> degree;
+    }
+    
+    TicTacToe game(boardSize, degree);
 
     cout << "Here is the board" << endl;
     game.visualize();
@@ -140,7 +227,7 @@ int main() {
         cin >> r >> c;
         moveResponse = game.move(r, c, 2);
 
-        if (moveResponse == 2) {
+        if (moveResponse == 1) {
             cout << "Y wins!" << endl;
             break;
         } else if (moveResponse == -1) {

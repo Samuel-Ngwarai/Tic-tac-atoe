@@ -2,4 +2,5 @@
 
 clear
 
+g++ -o tic tic.cpp
 ./tic
