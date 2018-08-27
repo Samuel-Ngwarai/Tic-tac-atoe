@@ -8,15 +8,6 @@ using namespace std;
 class TicTacToe {
     vector<vector<int> > board;
 public:
-    //vector<vector<int>> board;
-    map<int, int> rowsP;
-    map<int, int> colsP;
-    map<int, int> forwardP;
-    map<int, int> backwardsP;
-    map<int, int> rowsN;
-    map<int, int> colsN;
-    map<int, int> forwardN;
-    map<int, int> backwardsN;
     map<pair<int, int>, bool> visited;
     
     int boardSize;
@@ -33,8 +24,6 @@ public:
             cout << "This point has been visited before." << endl;
             return true;
         }
-        
-        //cout << endl << "First: " << point.first << " - Second: " << point.second << endl;
 
         if (point.first < 0 || point.second < 0 || point.first >= boardSize || point.second >= boardSize) {
             cout << "This point is invalid." << endl;
@@ -46,7 +35,6 @@ public:
     int checkBoard(pair<int, int> point, int pToken) {
         if (visited.size() == boardSize * boardSize) return -1;
 
-        cout << "Before Vertical " << endl;
         //check Vertical
         int vertical = 1;
         for (int i = point.first - 1; i >= 0; i--) {
@@ -60,7 +48,6 @@ public:
 
         if (vertical >= degree) return 1;
 
-        cout << "Before Horizontal " << endl;
         //check Horizontal
         int horizontal = 1;
         for (int i = point.second - 1; i >= 0; i--) {
@@ -71,10 +58,8 @@ public:
             if (board[point.first][i] != pToken) break;
             horizontal++;
         }
-        cout << horizontal << endl;
         if (horizontal >= degree) return 1;
 
-        cout << "Before Fdiagonal " << endl;
         //check Fdiagonal
         int fDiagonal = 1;
         int r = point.first - 1, c = point.second - 1;
@@ -94,7 +79,6 @@ public:
 
         if (fDiagonal >= degree) return 1;
         
-        cout << "Before Ndiagonal " << endl;
         //check Ndiagonal
         int nDiagonal = 1;
         r = point.first - 1, c = point.second + 1;
@@ -136,25 +120,7 @@ public:
         board[row][col] = diff;
         visited[point] = true;
 
-       // if (diff == 1) {
-       //     forwardP[row + col] += diff;
-       //     backwardsP[row - col + boardSize] += diff;
-       //     rowsP[row] += diff;
-       //     colsP[col] += diff;
-       // } else {
-       //     forwardN[row + col] += diff;
-       //     backwardsN[row - col + boardSize] += diff;
-       //     rowsN[row] += diff;
-       //     colsN[col] += diff;
-       // }
-
         return checkBoard(point, diff);
-        //cout << checkBoard(point, diff) << endl;
-
-        //if (rowsP[row] == degree || colsP[col] == degree || forwardP[row + col] == degree || backwardsP[row - col + boardSize] == degree) return 1;
-        //if (rowsN[row] == 0 - degree || colsN[col] == 0 - degree || forwardN[row + col] == 0 - degree || backwardsN[row - col + boardSize] == 0 - degree) return 2;
-        //if (visited.size() == boardSize * boardSize) return -1;
-        //return 0;
     }
 
     void visualize() {
