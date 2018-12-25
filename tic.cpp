@@ -3,15 +3,16 @@
 #include <map>
 using namespace std;
 
-//create a tic tac toe game
+//Creates tic-tac-a-go game
 
 class TicTacToe {
+    int boardSize;  // size of board to play on
+    int degree;     // minimum win condition
     vector<vector<int> > board;
+
 public:
+    // Visited places
     map<pair<int, int>, bool> visited;
-    
-    int boardSize;
-    int degree;
 
     TicTacToe(int n, int d) {
         board.resize(n, vector<int>(n, 0));
@@ -19,6 +20,7 @@ public:
         degree = d;
     }
 
+    // Check whether a point is valid
     bool invalid(pair<int, int> point) {
         if (visited[point]) {
             cout << "This point has been visited before." << endl;
@@ -32,6 +34,8 @@ public:
         return false;
     }
 
+    // Check whether given a starting point, and a token (x  or o), there exists
+    // a win condition. This uses a breadth first search-like algorithm.
     int checkBoard(pair<int, int> point, int pToken) {
         if (visited.size() == boardSize * boardSize) return -1;
 
@@ -102,6 +106,7 @@ public:
 
     }
 
+    // add token for certain player to a given position.
     int move(int row, int col, int player) {
         int diff;
         if (player == 1) diff = 1;
@@ -123,6 +128,7 @@ public:
         return checkBoard(point, diff);
     }
 
+    // Show what the board looks like after each play including numbers for positioning
     void visualize() {
         cout << "  ";
         for (int i = 0; i < boardSize; i++) cout << i << " ";
@@ -149,22 +155,23 @@ int main() {
     vector<vector<int> > board(3, vector<int>(3));
     cin >> boardSize;
 
-    while (boardSize < 2) {
-        cout << "Enter a number larger than 1 please" << endl;
+    // boardSize validation
+    while (boardSize < 3 && boardSize > 50) {
+        cout << "Enter a number '2 < x < 50' please" << endl;
         cin >> boardSize;
     }
    
-
     cout << "Pick the degree of the tic-tac-go-ing (number of X's/O'sin a line for win condition)" << endl;
 
     int degree;
     cin >> degree;
 
     while (degree < 3 || degree > boardSize) {
-        cout << "Make sure your degree is larger than 3 and smaller than your boardSize" << endl;
+        cout << "Make sure your degree is larger than 2 and smaller than " << boardSize << endl;
         cin >> degree;
     }
     
+    // Initialize game
     TicTacToe game(boardSize, degree);
 
     cout << "Here is the board" << endl;
