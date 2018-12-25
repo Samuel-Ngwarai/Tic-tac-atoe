@@ -166,8 +166,8 @@ int main() {
     int degree;
     cin >> degree;
 
-    while (degree < 3 || degree > boardSize) {
-        cout << "Make sure your degree is larger than 2 and smaller than " << boardSize << endl;
+    while (degree < 3 || degree > 10) {
+        cout << "Make sure your degree is larger than 2 and smaller than 10" << endl;
         cin >> degree;
     }
     
